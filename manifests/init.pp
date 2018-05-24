@@ -21,7 +21,7 @@ class ts_xml(
 		owner => 'salmgr',
 		group => 'lsst',
 		require => [User['salmgr'] , Group['lsst'], ],
-		recurse => true,
+		#recurse => true,
 	}
 	
 	#Copying xml files to the SAL/test directory and preserving ownernship because of the command above
