@@ -45,17 +45,6 @@ class ts_xml(
 			onlyif => "test $(ls -1 ${ts_sal_path}/test/idl-templates/${subsystem}_*.idl 2>/dev/null | wc -l) -eq 0 "
 		}
 
-		exec {"salgenerator-${subsystem}-lib":
-			path => '/bin:/usr/bin:/usr/sbin',
-			user => "salmgr",
-			group => "lsst",
-			cwd => "${ts_sal_path}/test/",
-			command => "/bin/bash -c 'source ${ts_sal_path}/setup.env ; ${ts_sal_path}/lsstsal/scripts/salgenerator ${subsystem} lib'",
-			timeout => 0,
-			require => Exec["copy-xml-files-${subsystem}"],
-			onlyif => "test $(ls -1 ${ts_sal_path}/test/lib/*${subsystem}.so 2>/dev/null | wc -l) -eq 0 "
-		}
-
 		$ts_xml_languages.each | String $lang | {
 			#Cannot override a variable on puppet, so I'm forced to duplicate each entry in the 'if' condition
 			if $lang == "labview"{
@@ -80,6 +69,17 @@ class ts_xml(
 				timeout => 0,
 				require => Exec["salgenerator-${subsystem}-validate"],
 				onlyif => $salgenerator_check
+			}
+			
+			exec {"salgenerator-${subsystem}-lib-${lang}":
+				path => '/bin:/usr/bin:/usr/sbin',
+				user => "salmgr",
+				group => "lsst",
+				cwd => "${ts_sal_path}/test/",
+				command => "/bin/bash -c 'source ${ts_sal_path}/setup.env ; ${ts_sal_path}/lsstsal/scripts/salgenerator ${subsystem} lib'",
+				timeout => 0,
+				require => Exec["salgenerator-${subsystem}-sal-${lang}"],
+				onlyif => "test $(ls -1 ${ts_sal_path}/test/lib/*${subsystem}.so 2>/dev/null | wc -l) -eq 0 "
 			}
 		}
 	}
