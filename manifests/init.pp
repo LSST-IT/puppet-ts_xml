@@ -71,6 +71,11 @@ class ts_xml(
 				onlyif => $salgenerator_check
 			}
 			
+			if $lang == "python"{
+				$onlyif_statement = "test $(ls -1 ${ts_sal_path}/test/lib/SALPY_*${subsystem}.so 2>/dev/null | wc -l) -eq 0 "
+			}else{
+				$onlyif_statement = "test $(ls -1 ${ts_sal_path}/test/lib/*${subsystem}.so 2>/dev/null | wc -l) -eq 0 "
+			}
 			exec {"salgenerator-${subsystem}-lib-${lang}":
 				path => '/bin:/usr/bin:/usr/sbin',
 				user => "salmgr",
@@ -79,7 +84,7 @@ class ts_xml(
 				command => "/bin/bash -c 'source ${ts_sal_path}/setup.env ; ${ts_sal_path}/lsstsal/scripts/salgenerator ${subsystem} lib'",
 				timeout => 0,
 				require => Exec["salgenerator-${subsystem}-sal-${lang}"],
-				onlyif => "test $(ls -1 ${ts_sal_path}/test/lib/*${subsystem}.so 2>/dev/null | wc -l) -eq 0 "
+				onlyif => $onlyif_statement
 			}
 		}
 	}
