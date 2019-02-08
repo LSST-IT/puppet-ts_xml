@@ -72,6 +72,16 @@ class ts_xml(
 			onlyif => "test $(ls -1 ${ts_sal_path}/${ts_xml_build_dir}/idl-templates/${subsystem}_*.idl 2>/dev/null | wc -l) -eq 0 "
 		}
 
+    exec {"salgenerator-${subsystem}-html":
+      path => '/bin:/usr/bin:/usr/sbin',
+      user => $ts_xml_user,
+      group => $ts_xml_group,
+      cwd => "${ts_sal_path}/${ts_xml_build_dir}/",
+      command => "/bin/bash -c 'source ${ts_sal_path}/setup.env ; ${ts_sal_path}/lsstsal/scripts/salgenerator ${subsystem} html'",
+      timeout => 0,
+      onlyif => "test $(ls -1 ${ts_sal_path}/${ts_xml_build_dir}/idl-templates/${subsystem}_*.idl 2>/dev/null | wc -l) -ne 0 "
+    }
+
 		$ts_xml_languages.each | String $lang | {
 			#Cannot override a variable on puppet, so I'm forced to duplicate each entry in the 'if' condition
 			if $lang == "labview"{
