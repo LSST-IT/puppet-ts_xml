@@ -103,7 +103,7 @@ class ts_xml(
 				cwd => "${ts_sal_path}/${ts_xml_build_dir}/",
 				command => $salgenerator_cmd,
 				timeout => 0,
-				require => Exec["salgenerator-${subsystem}-validate"],
+				require => Exec["salgenerator-${subsystem}-html"],
 				onlyif => $salgenerator_check
 			}
 			
